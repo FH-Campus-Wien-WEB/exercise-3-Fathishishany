@@ -1,14 +1,11 @@
 function setMovie(movie) {
-
   for (const element of document.forms[0].elements) {
     const name = element.id;
     const value = movie[name];
-    
+
     if (name === "Genres") {
-      const options = element.options;
-      for (let index = 0; index < options.length; index++) {
-        const option = options[index];
-        option.selected = value.indexOf(option.value) >= 0;
+      for (let i = 0; i < element.options.length; i++) {
+        element.options[i].selected = value.indexOf(element.options[i].value) >= 0;
       }
     } else {
       element.value = value;
@@ -19,31 +16,27 @@ function setMovie(movie) {
 function getMovie() {
   const movie = {};
 
-  const elements = Array.from(document.forms[0].elements).filter(element => element.id)
+  for (const element of document.forms[0].elements) {
+    if (!element.id) continue;
 
-  for (const element of elements) {
     const name = element.id;
 
-    let value;
-
     if (name === "Genres") {
-      value = [];
-      const options = element.options;
-      for (let index = 0; index < options.length; index++) {
-        const option = options[index];
-        if (option.selected) {
-          value.push(option.value);
+      movie[name] = [];
+      for (let i = 0; i < element.options.length; i++) {
+        if (element.options[i].selected) {
+          movie[name].push(element.options[i].value);
         }
       }
-    } else if (name === "Metascore" || name === "Runtime" || name === "imdbRating") {
-        value = Number(element.value);
+    } else if (name === "Runtime" || name === "Metascore" || name === "imdbRating") {
+      movie[name] = Number(element.value);
     } else if (name === "Actors" || name === "Directors" || name === "Writers") {
-      value = element.value.split(",").map((item) => item.trim());
+      movie[name] = element.value.split(",").map(function (item) {
+        return item.trim();
+      });
     } else {
-      value = element.value;
+      movie[name] = element.value;
     }
-
-    movie[name] = value;
   }
 
   return movie;
@@ -52,33 +45,35 @@ function getMovie() {
 function putMovie() {
   const movie = getMovie();
 
-  const xhr = new XMLHttpRequest()
-  xhr.onload = function() {
-    if (xhr.status == 200 || xhr.status === 204) {
-      location.href = 'index.html'
+  const xhr = new XMLHttpRequest();
+  xhr.open("PUT", "/movies/" + movie.imdbID);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onload = function () {
+    if (xhr.status === 200 || xhr.status === 201) {
+      location.href = "index.html";
     } else {
-      alert("Saving of movie data failed. Status code was " + response.status)
+      alert("Fehler beim Speichern: " + xhr.status);
     }
-  }
-  
-  xhr.open("PUT", "/movies/" + movie.imdbID)
-  xhr.setRequestHeader("Content-Type", "application/json")
+  };
 
-  xhr.send(JSON.stringify(movie))
-
+  xhr.send(JSON.stringify(movie));
 }
 
-/** Loading and setting the movie data for the movie with the passed imdbID */
-const imdbID = new URLSearchParams(window.location.search).get("imdbID");
+window.onload = function () {
+  const imdbID = new URLSearchParams(window.location.search).get("imdbID");
 
-const xhr = new XMLHttpRequest();
-xhr.open("GET", "/movies/" + imdbID);
-xhr.onload = function() {
-  if (xhr.status === 200) {
-    setMovie(JSON.parse(xhr.responseText));
-  } else {
-    alert("Loading of movie data failed. Status was " + xhr.status + " - " + xhr.statusText);
-  } 
-}
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "/movies/" + imdbID);
 
-xhr.send()
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const movie = JSON.parse(xhr.responseText);
+      setMovie(movie);
+    } else {
+      alert("Film nicht gefunden: " + xhr.status);
+    }
+  };
+
+  xhr.send();
+};

@@ -5,49 +5,78 @@ h1 {
   margin: 8px 0px;
 }
 
-/* Constrain the page to the viewport */
 html, body {
-  height: 100vh;
+  margin: 0;
 }
 
-/* Center the nav's header and list */
+@media (min-width: 768px) {
+  body {
+    display: grid;
+    grid-template-areas:
+      "h h"
+      "n m"
+      "n f";
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+  }
+
+  header { grid-area: h; }
+  nav    { grid-area: n; }
+  main   { grid-area: m; overflow-y: auto; }
+  footer { grid-area: f; }
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 nav {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* navigation buttons have full width */
+nav > ul {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  padding: 8px;
+  list-style-type: none;
+  margin: 0;
+}
+
 nav button {
   width: 100%;
 }
 
-/* Remove unnecessary space and bullets from the lists */
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  color: #333;
+}
+
+footer > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  list-style-type: none;
+  margin: 0;
+}
+
 ul {
   padding: 0px;
   margin: 16px;
   list-style-type: none;
 }
 
-/* Task 2.1. Lay out the childs of the 'body' using Grid Template Areas. */
-
-
-/* Task 3.1. Make the header element a flex container and center its children
-   vertically and horizontally.
- */
-
-
-/* Task 3.2. Make the list items of the unordered list in the nav element a flex container, 
-   use column direction and center the child items
- */
-
-/* Task 3.3. Make the main element a Flexbox container */
-
-
-/* Task 3.4. Make the footer's ul a Flexbox container */
-
-
-/* From here on styling from exercise 1 */
 img {
   border-radius: 12px;
 }
@@ -74,4 +103,21 @@ span {
   border-radius: 6px;
   background-color: darkgray;
   font-weight: bold;
+}
+
+body {
+  font-family: "Trebuchet MS", sans-serif;
+  background-color: brown;
+  color: beige;
+}
+
+button {
+  padding: 4px;
+  border-width: 1px;
+  border-radius: 4px;
+  font-size: 105%;
+}
+
+button:hover {
+  background-color: darkgray;
 }
